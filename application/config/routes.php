@@ -7,4 +7,10 @@ $route['translate_uri_dashes'] = FALSE;
 // Define custom routes for business registration
 $route['business-registration'] = 'business_registration/index';
 $route['save-registration'] = 'business_registration/save_registration';
-$route['mail'] = ' mail';
+
+
+
+
+$route['business_registration/fetch_data'] = 'business_registration/fetch_data';
+
+$route['business_registration/fetch_corporate_address'] = 'business_registration/fetch_corporate_address';
