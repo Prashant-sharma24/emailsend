@@ -53,37 +53,55 @@ public function fetch_corporate_names() {
 		$this->form_validation->set_rules('contact_person_name', 'Contact Person Name', 'required');
 		$this->form_validation->set_rules('business_email', 'Business Email', 'required|valid_email');
 		$this->form_validation->set_rules('contact_number', 'Contact Number', 'required');
-		$this->form_validation->set_rules('business_name', 'Business Name', 'required');
 		$this->form_validation->set_rules('address', 'Address', 'required');
 		$this->form_validation->set_rules('country', 'Country', 'required');
 		$this->form_validation->set_rules('state', 'State', 'required');
 		$this->form_validation->set_rules('zip_code', 'Zip Code', 'required');
 		$this->form_validation->set_rules('gst_no', 'GST No', 'required');
 	
+		// Check if customer type is corporate
+		if ($this->input->post('customer_type') == 'corporate') {
+			// If customer type is corporate, 'business_name' is not required
+			$this->form_validation->set_rules('corporate_name', 'corporate Name', ''); // No validation rule for 'business_name'
+
+		} else {
+			// If customer type is non-corporate, 'business_name' is required
+			$this->form_validation->set_rules('business_name', 'Business Name', 'required');
+		}
+	
+		// Check if form validation passed
 		if ($this->form_validation->run() == FALSE) {
 			// Validation failed, reload the form with validation errors
 			$this->load->view('registration_form');
 		} else {
 			// Form data is valid, proceed to save to database
+	
+			// Prepare data array for insertion into the database
 			$data = array(
 				'contact_person_name' => $this->input->post('contact_person_name'),
 				'business_email' => $this->input->post('business_email'),
 				'contact_number' => $this->input->post('contact_number'),
-				'business_name' => $this->input->post('business_name'),
 				'address' => $this->input->post('address'),
 				'country' => $this->input->post('country'),
 				'state' => $this->input->post('state'),
 				'zip_code' => $this->input->post('zip_code'),
 				'gst_no' => $this->input->post('gst_no')
 			);
-	// var_dump($data);die;
+	
 			// Check if it's a corporate customer
 			if ($this->input->post('customer_type') == 'corporate') {
-				$data['corporate_address'] = $this->input->post('corporate_address');
+				// If it's a corporate customer, get the selected business name from the dropdown
+				$data['business_name'] = $this->fetch_business_name($this->input->post('corporate_name'));
 
-				$data['corporate_code'] = $this->input->post('corporate_name');
+
+			
 				$data['payment_option'] = $this->input->post('payment_option');
+			} else {
+				// If it's a non-corporate customer, get the business name entered by the user
+				$data['business_name'] = $this->input->post('business_name');
 			}
+// var_dump($data);
+// die;	
 	
 			// Save data to database
 			$this->load->model('client_model');
@@ -141,6 +159,11 @@ public function fetch_corporate_names() {
 		}
 	}
 	
-
+	private function fetch_business_name($corporate_name)
+	{
+		// Fetch the business name from the database based on the provided ID
+		// You need to implement this method in your model
+		return $this->client_model->get_business_name_by_id($corporate_name);
+	}
 }
 ?>
