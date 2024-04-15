@@ -47,7 +47,7 @@ class Client_model extends CI_Model {
 
 	// Model: Corporate_Model.php
 
-public function get_corporate_address($corporate_name_id) {
+public function pget_corporate_address($corporate_name_id) {
     $query = $this->db->select('address')
         ->from('corporate_master')
         ->where('id', $corporate_name_id)
@@ -62,8 +62,34 @@ public function get_corporate_address($corporate_name_id) {
     }
 }
 
-	
-	
+public function get_corporate_address($corporate_name_id) {
+    // Select all fields from the 'corporate_master' table where the 'id' matches $corporate_name_id
+    $query = $this->db->where('id', $corporate_name_id)
+                      ->get('corporate_master');
+
+    // Check if query was successful
+    if ($query->num_rows() > 0) {
+        // If the query returned at least one row, extract the data from the first row as an associative array
+        return $query->row_array();
+    } else {
+        // If no rows were returned, return an empty array
+        return array();
+    }
+}
+
+public function get_business_name_by_id($corporate_name) {
+	// Fetch the business name from the database based on the provided ID
+	$query = $this->db->get_where('corporate_master', array('id' => $corporate_name));
+
+	// Check if the query returned a result
+	if ($query->num_rows() > 0) {
+		// Return the business name
+		return $query->row()->business_name;
+	} else {
+		// If no result found, return false or handle the error as needed
+		return false;
+	}
+}
 	
 }
 ?>
